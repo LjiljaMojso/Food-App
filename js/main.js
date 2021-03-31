@@ -7,14 +7,14 @@ var recipesSection = document.getElementById("recipes");
 var minCal = document.querySelector('input.minCal');
 var maxCal = document.querySelector('input.maxCal');
 
-function getData(showResultsFromIndex) {
+function getData(showResults) {
   var request = new XMLHttpRequest();
   var loader = createLoader();
-  var url = requestUrl(showResultsFromIndex);
+  var url = requestUrl(showResults);
 
   request.open("GET", url);
 
-  request.onload = function () {
+  request.onload = () => {
     if (request.status === 200 || request.status === 201) {
       createContent(JSON.parse(request.responseText));
       loader.innerHTML = "";
@@ -24,7 +24,7 @@ function getData(showResultsFromIndex) {
   request.send();
 }
 
-function requestUrl(showResultsFromIndex = 0) {
+function requestUrl(showResults = 0) {
   
   var diet = document.querySelector('select[name="diet"]');
   var dietType = diet.value ? "&diet=" + diet.value : "";
@@ -33,7 +33,7 @@ function requestUrl(showResultsFromIndex = 0) {
   var url;
 
   url =
-  "https://api.edamam.com/search?q=" +searchInput.value +"&app_id=" +appId +"&app_key=" +appKey +"&from=" + showResultsFromIndex +"&calories=" +minCal.value +"-" +maxCal.value +dietType +healthType;
+  `https://api.edamam.com/search?q=${searchInput.value}&app_id=${appId}&app_key=${appKey}&from=${showResults}&calories=${minCal.value}-${maxCal.value}${dietType}${healthType}`;
 
   return url;
 }
@@ -66,34 +66,38 @@ function createContent(data) {
 }
 
 function createRecipe(article) {
-  var recipeDiv = document.createElement("div");
+  var recipeDiv = document.createElement("article");
   recipeDiv.classList.add("recipe-element");
   recipeDiv.addEventListener("click", function () {
     window.open(article.recipe.url, "_blank");
   });
   var recipeImg = document.createElement("img");
   recipeImg.setAttribute("src",article.recipe.image);
-  recipeDiv.prepend(recipeImg);
+  recipeDiv.appendChild(recipeImg);
   var h3 = document.createElement("h3");
   h3.textContent = article.recipe.label;
-  recipeDiv.prepend(h3);
+  recipeDiv.appendChild(h3);
   var paragraf = document.createElement("p");
-  paragraf.textContent =  Math.round(article.recipe.calories / article.recipe.yield) + " kcal",
-      "calories";
-  recipeDiv.prepend(paragraf);
-    getLabels(article.recipe.healthLabels)
-
-  recipesSection.append(recipeDiv);
+  paragraf.textContent =  Math.round(article.recipe.calories / article.recipe.yield) + " kcal";
+  paragraf.classList.add("calories");
+  recipeDiv.appendChild(paragraf);
+  recipeDiv.appendChild(getLabels(article.recipe.healthLabels))
+    
+  recipesSection.appendChild(recipeDiv);
 }
 
 function getLabels(labels) {
-  var lablesDiv = document.createElement("div", "", "labels");
+  var lablesDiv = document.createElement("div","","labels");
+  lablesDiv.classList.add("labels");
 
   labels.forEach(function (label) {
     var labelParagraf = document.createElement("p", label,"label");
-    labelParagraf.textContent=label;
-    lablesDiv.append(labelParagraf);
+    labelParagraf.classList.add("label");
+    labelParagraf.textContent=("string",label)
+
+    lablesDiv.appendChild(labelParagraf);
   });
+
   return lablesDiv;
 }
 
